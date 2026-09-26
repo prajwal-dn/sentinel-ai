@@ -1,0 +1,1 @@
+"""Sentinel AI application package."""
