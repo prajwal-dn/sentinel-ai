@@ -9,7 +9,7 @@ An evidence-grounded cybersecurity incident response/SOC demo. Sentinel AI deter
 ```bash
 python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt
-./run.sh
+bash run.sh
 ```
 
 Open <http://localhost:8000>. Click **Run Demo Investigation**.
