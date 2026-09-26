@@ -1,38 +1,52 @@
-# Sentinel AI
+ # 🛡️ Sentinel AI
 
-An evidence-grounded cybersecurity incident response/SOC demo. Sentinel AI deterministically correlates simulated SSH brute-force events with a successful login and suspicious post-authentication activity, then generates an explainable incident, MITRE ATT&CK mapping, timeline, IOCs, recommendations, agent trace, and downloadable report.
+### Evidence-Grounded Autonomous Cybersecurity Incident Investigator
 
-> **Demo safety:** Included events are simulated and clearly labelled. No SIEM is connected. The app never executes response actions; approvals are records for human-led response only.
+Sentinel AI is an evidence-grounded cybersecurity incident investigation platform designed to help security teams turn raw security telemetry into structured, explainable incidents.
 
-## Quick start
+Instead of simply detecting suspicious events, Sentinel AI follows a multi-stage investigation workflow:
 
-```bash
-python3 -m venv .venv
-.venv/bin/pip install -r requirements.txt
-bash run.sh
-```
+**Observe → Analyze → Correlate → Map → Assess → Recommend → Report**
 
-Open <http://localhost:8000>. Click **Run Demo Investigation**.
+The system correlates security events, identifies attack patterns, extracts indicators of compromise, reconstructs attack timelines, maps observed behavior to MITRE ATT&CK, assesses severity and confidence, and generates an investigation report.
 
-## Tests
+> **AI investigates. Humans stay in control.**
 
-```bash
-.venv/bin/pytest -q
-```
+---
 
-## API
+## ✨ What Sentinel AI Does
 
-- `GET /api/health`
-- `GET /api/events`
-- `GET /api/incidents`
-- `GET /api/incidents/{id}`
-- `GET /api/incidents/{id}/report`
-- `GET /api/mitre`
-- `GET /api/connectors`
-- `POST /api/demo/reset`
-- `POST /api/incidents/{id}/approve`
-- `POST /api/incidents/{id}/reject`
+Sentinel AI transforms security events into an explainable investigation.
 
-## Architecture
+### 🔍 Evidence Correlation
+Connects related security events into a single incident rather than treating every event independently.
 
-A small FastAPI service serves both the JSON API and a dependency-light HTML/CSS/JavaScript frontend. The deterministic correlation engine in `app/detector.py` cites event IDs for every finding and explicitly marks uncertainty. External threat intelligence is `LOCAL / UNAVAILABLE` until a real provider is configured.
+### 🚨 Incident Classification
+Determines the attack pattern, severity, confidence, and supporting evidence.
+
+### 🧩 IOC Extraction
+Identifies relevant indicators of compromise from the available security evidence.
+
+### 🕒 Attack Timeline
+Reconstructs the sequence of events to help analysts understand how an incident developed.
+
+### 🎯 MITRE ATT&CK Mapping
+Maps observed behaviors to relevant MITRE ATT&CK techniques and tactics.
+
+### 🤖 Agent Investigation Trace
+Exposes the investigation stages performed by the system:
+
+```text
+OBSERVING
+    ↓
+ANALYZING
+    ↓
+CORRELATING
+    ↓
+MAPPING
+    ↓
+ASSESSING
+    ↓
+RECOMMENDING
+    ↓
+REPORTING
