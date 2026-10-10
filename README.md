@@ -9,6 +9,12 @@ cites the source events it came from. It never executes response actions.
 > **File uploads are not live telemetry.** The UI says so everywhere. "LIVE" appears only when the Wazuh connector is
 > actually receiving recent alerts.
 
+## Investigation workflow
+
+**Observe -> Analyze -> Correlate -> Map -> Assess -> Recommend -> Report**
+
+Sentinel AI correlates security events into cases, extracts indicators of compromise (IOCs), reconstructs timelines, maps observed behavior to MITRE ATT&CK, assesses severity and confidence, and generates investigation reports. Findings should be checked against cited events. AI recommendations do not execute response actions; humans remain in control.
+
 ## What is real, what is optional
 
 | Capability | Status |
