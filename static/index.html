@@ -1,1 +1,21 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sentinel AI — Autonomous Investigation. Human Control.</title><link rel="stylesheet" href="/assets/style.css"></head><body><section id="hero"><header><b class="brand"><i>S</i>SENTINEL <em>AI</em></b><span class="demo">DEMO SYSTEM READY</span></header><main><small>◆ EVIDENCE-GROUNDED INCIDENT RESPONSE</small><h1>Autonomous investigation.<br><em>Human control.</em></h1><p>Correlate security telemetry into explainable incidents, map observed behavior to MITRE ATT&amp;CK, and prepare response — without inventing evidence or taking action autonomously.</p><button onclick="enter()">Enter SOC ↗</button><button class="ghost" onclick="runDemo()">Run Demo Investigation ▶</button></main><footer>SIMULATION ENVIRONMENT · NO LIVE TELEMETRY · DEMO MODE</footer></section><section id="soc" class="hide"><aside><b class="brand"><i>S</i>SENTINEL <em>AI</em></b><nav id="nav"></nav><div class="safe"><b>● HUMAN CONTROL</b><p>No response actions execute automatically.</p></div></aside><article><header><span>SENTINEL / <b id="crumb">OVERVIEW</b></span><span class="demo">DEMO MODE</span></header><div id="content"><div class="load">LOADING SOC WORKSPACE…</div></div></article></section><script src="/assets/app.js"></script></body></html>
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sentinel AI — Evidence-grounded security investigation</title>
+<link rel="stylesheet" href="/assets/style.css"></head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<section id="soc">
+  <aside aria-label="Primary">
+    <b class="brand"><i>S</i>SENTINEL <em>AI</em></b>
+    <nav id="nav" aria-label="Views"></nav>
+    <div class="safe"><b>● HUMAN CONTROL</b><p>Sentinel AI never executes response actions. Approvals are decision records only.</p></div>
+  </aside>
+  <article>
+    <header><span>SENTINEL / <b id="crumb">OVERVIEW</b></span><span id="modebadge" class="pill muted">LOADING</span></header>
+    <div id="live" class="sr" role="status" aria-live="polite"></div>
+    <main id="content" tabindex="-1"><div class="load">LOADING WORKSPACE…</div></main>
+  </article>
+</section>
+<div id="drawer" class="drawer hide" role="dialog" aria-modal="false" aria-label="Evidence detail"></div>
+<script src="/assets/app.js"></script>
+</body></html>
