@@ -8,8 +8,15 @@ const html = (s, ...v) => raw(s.reduce((a, t, i) => a + t + (i < v.length ? rend
 const q = s => document.querySelector(s), qa = s => [...document.querySelectorAll(s)];
 
 const S = { status: null, datasets: [], invs: [], view: 'overview', arg: null, lastIngest: null, busy: false, error: null };
-const NAV = { overview: '⌂ Overview', ingest: '⇪ Ingest logs', events: '≡ Events', investigations: '◇ Investigations', mitre: '▦ MITRE ATT&CK',
-  connectors: '⌘ Connectors', settings: '⚙ Status & settings' };
+const NAV = {
+  overview: 'Overview',
+  ingest: 'Ingest',
+  events: 'Events',
+  investigations: 'Cases',
+  mitre: 'MITRE ATT&CK',
+  connectors: 'Connectors',
+  settings: 'Settings',
+};
 
 const token = () => sessionStorage.getItem('sentinel_token') || '';
 async function api(path, opts = {}) {
@@ -37,7 +44,7 @@ async function refresh() {
   const c = status.connectors[0];
   const b = q('#modebadge');
   b.className = 'pill ' + (c.live ? 'ok' : 'muted');
-  b.textContent = c.live ? 'LIVE: WAZUH CONNECTED' : 'NO LIVE FEED · FILE ANALYSIS';
+  b.textContent = c.live ? 'LIVE: WAZUH CONNECTED' : 'NO LIVE FEED / FILE ANALYSIS';
 }
 
 /* ------------------------------------------------------------------ views */
@@ -52,12 +59,11 @@ function overview() {
     <div class="card stat"><small>AI AGENT</small><b class="${st.llm.configured ? 'green' : 'amber'}">${st.llm.configured ? 'READY' : 'OFF'}</b><small>${st.llm.status}</small></div></div>`;
   if (!S.datasets.length) {
     return html`${head('COMMAND CENTER', 'Security overview', 'Sentinel AI investigates real security logs. Nothing is pre-loaded.')}${stats}
-      <div class="empty gap"><h2>No logs yet</h2><p>Upload an auth.log, syslog, JSON/JSONL, Wazuh alert export or Windows event XML to start an investigation.<br>
-      You can also configure a live Wazuh connector (currently <b>${c.status}</b>).</p>
-      <button class="btn" data-act="nav" data-v="ingest">Upload logs ↗</button> <button class="btn ghost" data-act="nav" data-v="connectors">Connector setup</button></div>`;
+      <div class="empty gap"><h2>No logs yet</h2><p>Upload an auth.log, syslog, JSON/JSONL, Wazuh alert export or Windows event XML to start an investigation.</p>
+      <button class="btn" data-act="nav" data-v="ingest">Upload logs</button></div>`;
   }
   const rows = S.invs.length ? html`<table class="table"><tr><th>CASE</th><th>SEVERITY (RULES)</th><th>FINDINGS</th><th>HOSTS</th><th>AI</th></tr>
-    ${S.invs.map(i => html`<tr><td><button class="btn ghost sm" data-act="open" data-id="${i.id}">${i.id}</button><br><span class="sp">${i.title}</span></td><td>${sev(i.severity)}</td><td>${i.findings}</td><td>${i.hosts.join(', ')}</td><td>${i.agent_status}${i.ai_assessment ? ' · ' + i.ai_assessment : ''}</td></tr>`)}</table>`
+    ${S.invs.map(i => html`<tr><td><button class="btn ghost sm" data-act="open" data-id="${i.id}">${i.id}</button><br><span class="sp">${i.title}</span></td><td>${sev(i.severity)}</td><td>${i.findings}</td><td>${i.hosts.join(', ')}</td><td>${i.agent_status}${i.ai_assessment ? ' / ' + i.ai_assessment : ''}</td></tr>`)}</table>`
     : alertBox('info', 'Datasets are loaded but no analysis has produced cases yet (or no suspicious patterns were detected). Open Ingest logs and press Analyze.');
   return html`${head('COMMAND CENTER', 'Security overview', 'State of your uploaded data and investigations.')}${stats}
     <div class="card gap"><div class="title">INVESTIGATIONS</div><div class="box scroll">${rows}</div></div>`;
@@ -74,23 +80,23 @@ function ingest() {
       <dt>UNCLASSIFIED</dt><dd>${s.accepted_but_unclassified} accepted events could not be classified; they are stored but do not drive detections.</dd>
       <dt>NO TIMESTAMP</dt><dd>${s.accepted_without_timestamp}</dd></dl>
       ${(s.caveats || []).map(c => alertBox('warn', c))}
-      ${[...s.rejected_samples.map(r => ['Rejected', r]), ...s.unsupported_samples.map(r => ['Unsupported', r])].slice(0, 10).map(([k, r]) => html`<p class="sp">${k} · record ${r.position}: ${r.reason} <span class="mono">${r.excerpt}</span></p>`)}
-      ${li.dataset_id ? html`<button class="btn" data-act="analyze" data-id="${li.dataset_id}">Analyze dataset ▶</button>` : ''}</div>`;
+      ${[...s.rejected_samples.map(r => ['Rejected', r]), ...s.unsupported_samples.map(r => ['Unsupported', r])].slice(0, 10).map(([k, r]) => html`<p class="sp">${k} / record ${r.position}: ${r.reason} <span class="mono">${r.excerpt}</span></p>`)}
+      ${li.dataset_id ? html`<button class="btn" data-act="analyze" data-id="${li.dataset_id}">Analyze dataset</button>` : ''}</div>`;
   }
   const opts = S.datasets.map(d => html`<option value="${d.id}">${d.name} (${d.event_count} events)</option>`);
   const dsRows = S.datasets.length ? html`<table class="table"><tr><th>DATASET</th><th>SOURCE</th><th>EVENTS</th><th>RANGE</th><th></th></tr>${S.datasets.map(d => html`<tr>
-    <td>${d.name}<br><span class="sp mono">${d.id}</span></td><td>${d.source_kind === 'FILE_UPLOAD' ? pill('FILE UPLOAD · NOT LIVE', 'muted') : pill(d.source_kind, 'info')}</td><td>${d.event_count}</td>
+    <td>${d.name}<br><span class="sp mono">${d.id}</span></td><td>${d.source_kind === 'FILE_UPLOAD' ? pill('FILE UPLOAD / NOT LIVE', 'muted') : pill(d.source_kind, 'info')}</td><td>${d.event_count}</td>
     <td class="sp">${tm(d.first_event)}<br>${tm(d.last_event)}</td><td><button class="btn sm" data-act="analyze" data-id="${d.id}">Analyze</button>
     <button class="btn ghost sm" data-act="events" data-id="${d.id}">Events</button> <button class="btn danger sm" data-act="delete" data-id="${d.id}">Delete</button></td></tr>`)}</table>`
     : html`<p class="sp">No datasets yet.</p>`;
-  const fmts = Object.entries(S.status.supported_formats).map(([k, v]) => html`<li><b>${k}</b> — ${v}</li>`);
+  const fmts = Object.entries(S.status.supported_formats).map(([k, v]) => html`<li><b>${k}</b> - ${v}</li>`);
   return html`${head('INGESTION', 'Ingest logs', 'Upload real security logs. Files are parsed, validated and normalised; unparseable records are reported, never silently dropped.')}
     <div class="card box"><div class="dz" id="dz"><p>Drop a log file here or choose one (max ${S.status.limits.max_upload_mb} MB)</p>
     <input type="file" id="file" aria-label="Log file" accept=".log,.txt,.json,.jsonl,.ndjson,.xml,.out,.syslog"></div>
     <div class="gap"><span class="field"><label for="dsname">Dataset name (optional)</label><input id="dsname" maxlength="120"></span>
     <span class="field"><label for="dsid">Add to existing dataset</label><select id="dsid"><option value="">New dataset</option>${opts}</select></span>
     <span class="field"><label for="year">Year for syslog lines (no year in file)</label><input id="year" type="number" min="1990" max="2100" value="${new Date().getFullYear()}"></span></div>
-    <button class="btn" id="upload" data-act="upload" ${S.busy ? 'disabled' : ''}>${S.busy ? 'Uploading…' : 'Upload & parse'}</button></div>
+    <button class="btn" id="upload" data-act="upload" ${S.busy ? 'disabled' : ''}>${S.busy ? 'Uploading...' : 'Upload & parse'}</button></div>
     ${result}
     <div class="card gap"><div class="title">DATASETS</div><div class="box scroll">${dsRows}</div></div>
     <div class="card gap box"><div class="title">SUPPORTED FORMATS</div><ul class="sp">${fmts}</ul><p class="sp">Binary .evtx is not supported: export to XML or JSON first.</p></div>`;
@@ -103,10 +109,10 @@ async function eventsView() {
   const params = new URLSearchParams(Object.entries(f).filter(([, v]) => v)); params.set('limit', '200');
   const r = await api(`/api/datasets/${encodeURIComponent(id)}/events?` + params);
   const filt = k => html`<span class="field"><label for="f_${k}">${k}</label><input id="f_${k}" value="${f[k] || ''}" data-filter="${k}"></span>`;
-  return html`${head('EVENTS', 'Events', 'Normalised events with source evidence. Missing fields stay empty — never inferred.')}
+  return html`${head('EVENTS', 'Events', 'Normalised events with source evidence. Missing fields stay empty; never inferred.')}
     <div class="card box"><span class="field"><label for="dssel">Dataset</label><select id="dssel">${S.datasets.map(d => html`<option value="${d.id}" ${d.id === id ? 'selected' : ''}>${d.name}</option>`)}</select></span>
     ${['text', 'host', 'username', 'src_ip', 'action', 'outcome'].map(filt)}<button class="btn sm" data-act="filter">Apply</button></div>
-    <div class="card gap"><div class="title">${r.total} MATCHING · SHOWING ${r.count}</div><div class="box scroll"><table class="table"><tr><th>TIME (UTC)</th><th>ID</th><th>HOST</th><th>USER</th><th>SRC</th><th>ACTION</th><th>OUTCOME</th><th>MESSAGE</th></tr>
+    <div class="card gap"><div class="title">${r.total} MATCHING / SHOWING ${r.count}</div><div class="box scroll"><table class="table"><tr><th>TIME (UTC)</th><th>ID</th><th>HOST</th><th>USER</th><th>SRC</th><th>ACTION</th><th>OUTCOME</th><th>MESSAGE</th></tr>
     ${r.events.map(e => html`<tr><td>${tm(e.timestamp)}</td><td><button class="ev" data-act="event" data-id="${e.event_id}" data-ds="${id}">${e.event_id}</button></td><td>${e.host}</td><td>${e.username}</td><td>${e.src_ip}</td><td>${e.action}</td><td>${e.outcome}</td><td class="mono">${(e.message || '').slice(0, 140)}</td></tr>`)}</table></div></div>`;
 }
 
@@ -114,56 +120,56 @@ function investigations() {
   if (!S.invs.length) return html`${head('CASES', 'Investigations', 'Cases are produced by analysing a dataset.')}<div class="empty"><h2>No investigations</h2><p>${S.datasets.length ? 'Analyze a dataset from Ingest logs. If nothing suspicious matches the configured rules, no case is created.' : 'Upload logs first.'}</p><button class="btn" data-act="nav" data-v="ingest">Go to ingestion</button></div>`;
   return html`${head('CASES', 'Investigations', 'Severity shown is from transparent rules. AI confidence is separate and only present after an agent run.')}
   <div class="card"><div class="box scroll"><table class="table"><tr><th>CASE</th><th>SEVERITY (RULES)</th><th>FINDINGS</th><th>WINDOW</th><th>AI INVESTIGATION</th></tr>
-  ${S.invs.map(i => html`<tr><td><button class="btn ghost sm" data-act="open" data-id="${i.id}">${i.id}</button><br>${i.title}</td><td>${sev(i.severity)}${i.attack_chain ? pill('CHAIN', 'bad') : ''}</td><td>${i.findings}</td><td class="sp">${tm(i.first_seen)}<br>${tm(i.last_seen)}</td><td>${i.agent_status}${i.ai_assessment ? ' · ' + i.ai_assessment : ''}</td></tr>`)}</table></div></div>`;
+  ${S.invs.map(i => html`<tr><td><button class="btn ghost sm" data-act="open" data-id="${i.id}">${i.id}</button><br>${i.title}</td><td>${sev(i.severity)}${i.attack_chain ? pill('CHAIN', 'bad') : ''}</td><td>${i.findings}</td><td class="sp">${tm(i.first_seen)}<br>${tm(i.last_seen)}</td><td>${i.agent_status}${i.ai_assessment ? ' / ' + i.ai_assessment : ''}</td></tr>`)}</table></div></div>`;
 }
 
 async function incident() {
   const v = await api('/api/investigations/' + encodeURIComponent(S.arg));
   const a = v.agent || { status: 'NOT_RUN' }, res = a.result;
   const llm = S.status.llm;
-  const hdr = html`<div class="card case box"><div class="row">${sev(v.severity)} ${pill('RULE-BASED SEVERITY', 'muted')} ${v.case.attack_chain ? pill('ATTACK CHAIN', 'bad') : ''} ${pill(v.source.kind === 'FILE_UPLOAD' ? 'FILE UPLOAD · NOT LIVE TELEMETRY' : v.source.kind, 'muted')}</div>
+  const hdr = html`<div class="card case box"><div class="row">${sev(v.severity)} ${pill('RULE-BASED SEVERITY', 'muted')} ${v.case.attack_chain ? pill('ATTACK CHAIN', 'bad') : ''} ${pill(v.source.kind === 'FILE_UPLOAD' ? 'FILE UPLOAD / NOT LIVE TELEMETRY' : v.source.kind, 'muted')}</div>
     <h2>${v.title}</h2><p class="note">${v.severity_basis.join(' ')}</p>
-    <dl class="kv gap"><dt>CASE</dt><dd class="mono">${v.id}</dd><dt>HOSTS</dt><dd>${v.case.hosts.join(', ') || 'unknown'}</dd><dt>ACCOUNTS</dt><dd>${v.case.users.join(', ') || 'unknown'}</dd><dt>IPS</dt><dd>${v.case.ips.join(', ') || 'unknown'}</dd><dt>WINDOW</dt><dd>${tm(v.case.first_seen)} → ${tm(v.case.last_seen)}</dd></dl>
-    <div class="row gap"><a class="btn ghost" href="/api/investigations/${encodeURIComponent(v.id)}/report" data-act="report" data-id="${v.id}">Download report ↓</a></div></div>`;
-  const links = v.case.correlation_links.length ? html`<ul class="sp">${v.case.correlation_links.map(l => html`<li>${l.findings.join(' ↔ ')}: ${l.reason}</li>`)}</ul>` : html`<p class="sp">Single finding; no correlation links.</p>`;
-  const findings = v.findings.map(f => html`<div class="item"><b>${f.finding_id} · ${f.title}</b> ${sev(f.severity)} ${pill('evidence: ' + f.evidence_strength)} ${pill(f.origin)}
+    <dl class="kv gap"><dt>CASE</dt><dd class="mono">${v.id}</dd><dt>HOSTS</dt><dd>${v.case.hosts.join(', ') || 'unknown'}</dd><dt>ACCOUNTS</dt><dd>${v.case.users.join(', ') || 'unknown'}</dd><dt>IPS</dt><dd>${v.case.ips.join(', ') || 'unknown'}</dd><dt>WINDOW</dt><dd>${tm(v.case.first_seen)} to ${tm(v.case.last_seen)}</dd></dl>
+    <div class="row gap"><a class="btn ghost" href="/api/investigations/${encodeURIComponent(v.id)}/report" data-act="report" data-id="${v.id}">Download report</a></div></div>`;
+  const links = v.case.correlation_links.length ? html`<ul class="sp">${v.case.correlation_links.map(l => html`<li>${l.findings.join(' <-> ')}: ${l.reason}</li>`)}</ul>` : html`<p class="sp">Single finding; no correlation links.</p>`;
+  const findings = v.findings.map(f => html`<div class="item"><b>${f.finding_id} / ${f.title}</b> ${sev(f.severity)} ${pill('evidence: ' + f.evidence_strength)} ${pill(f.origin)}
     <p>${f.description}</p><p><b>Severity basis:</b> ${f.severity_basis}</p><p><b>Explanation:</b> ${f.explanation}</p><p class="amber"><b>Uncertainty:</b> ${f.uncertainty}</p>
     <p>Evidence (${f.evidence_total}): ${evs(f.evidence_ids)}</p></div>`);
-  const timeline = html`<div class="timeline">${v.timeline.slice(0, 120).map(t => html`<div class="tl"><b>${tm(t.timestamp)} · ${t.stage} <button class="ev" data-act="event" data-id="${t.event_id}">${t.event_id}</button></b><p>${t.summary}</p></div>`)}</div>`;
-  const iocs = html`<table class="table"><tr><th>TYPE</th><th>VALUE</th><th>CONTEXT</th><th>ENRICHMENT</th></tr>${v.iocs.slice(0, 60).map(i => html`<tr><td>${i.type}${i.scope ? ' · ' + i.scope : ''}</td><td class="mono">${i.value}</td><td class="sp">${i.roles.slice(0, 2).join('; ')}<br>${evs(i.evidence_ids.slice(0, 3))}</td><td>${pill(i.enrichment.status, i.enrichment.status === 'MATCH' ? 'bad' : 'muted')} <span class="sp">${i.enrichment.detail || ''}</span></td></tr>`)}</table>
+  const timeline = html`<div class="timeline">${v.timeline.slice(0, 120).map(t => html`<div class="tl"><b>${tm(t.timestamp)} / ${t.stage} <button class="ev" data-act="event" data-id="${t.event_id}">${t.event_id}</button></b><p>${t.summary}</p></div>`)}</div>`;
+  const iocs = html`<table class="table"><tr><th>TYPE</th><th>VALUE</th><th>CONTEXT</th><th>ENRICHMENT</th></tr>${v.iocs.slice(0, 60).map(i => html`<tr><td>${i.type}${i.scope ? ' / ' + i.scope : ''}</td><td class="mono">${i.value}</td><td class="sp">${i.roles.slice(0, 2).join('; ')}<br>${evs(i.evidence_ids.slice(0, 3))}</td><td>${pill(i.enrichment.status, i.enrichment.status === 'MATCH' ? 'bad' : 'muted')} <span class="sp">${i.enrichment.detail || ''}</span></td></tr>`)}</table>
     <p class="sp">Extracted locally from cited events; not a verdict on maliciousness. ${S.status.threat_intel.message}</p>
     <button class="btn ghost sm" data-act="enrich" data-id="${v.id}">Run enrichment</button>`;
   const mitre = (list, origin) => list.map(m => html`<div class="mitre"><b>${m.technique_id} ${m.name}</b> ${pill(m.status, m.status === 'OBSERVED' ? 'ok' : 'warn')} ${pill(origin, 'muted')}<br><small>${m.tactic || 'tactic unverified'}</small><p class="sp">${m.basis || (m.bases || [])[0]}</p><p>${evs(m.evidence_ids.slice(0, 5))}</p></div>`);
   const mitreAll = (v.mitre.length || (v.mitre_ai || []).length) ? html`${mitre(v.mitre, 'RULE')}${mitre(v.mitre_ai || [], 'AI HYPOTHESIS')}` : html`<p class="sp">No technique mapping is supported by the evidence.</p>`;
   let ai;
-  const trace = (a.trace || []).map(s => html`<div class="step ${s.status === 'OK' || s.status === 'ACCEPTED' ? '' : 'err'}"><b>${s.step}. ${s.type}${s.tool ? ' → ' + s.tool : ''}</b> ${pill(s.status)}<br>
+  const trace = (a.trace || []).map(s => html`<div class="step ${s.status === 'OK' || s.status === 'ACCEPTED' ? '' : 'err'}"><b>${s.step}. ${s.type}${s.tool ? ' -> ' + s.tool : ''}</b> ${pill(s.status)}<br>
     ${s.rationale ? html`<small>why: ${s.rationale}</small><br>` : ''}${s.arguments && Object.keys(s.arguments).length ? html`<small class="mono">args: ${JSON.stringify(s.arguments)}</small><br>` : ''}<small>${s.result_summary || s.detail || s.error || ''}</small></div>`);
   if (a.status === 'NOT_RUN' || a.status === 'NOT_CONFIGURED') {
     ai = html`${alertBox(llm.configured ? 'info' : 'warn', llm.configured ? 'AI investigation has not been run for this case. Rule-based findings are shown above.' : llm.message)}
-      <button class="btn gap" data-act="agent" data-id="${v.id}" ${llm.configured ? '' : 'disabled'}>Run AI investigation ▶</button>`;
+      <button class="btn gap" data-act="agent" data-id="${v.id}" ${llm.configured ? '' : 'disabled'}>Run AI investigation</button>`;
   } else if (res) {
-    ai = html`${alertBox(res.assessment === 'LIKELY_MALICIOUS' ? 'bad' : 'info', html`<b>${res.assessment}</b> · model confidence <b>${res.confidence.level}</b> — ${res.confidence.rationale}`)}
+    ai = html`${alertBox(res.assessment === 'LIKELY_MALICIOUS' ? 'bad' : 'info', html`<b>${res.assessment}</b> / model confidence <b>${res.confidence.level}</b> - ${res.confidence.rationale}`)}
       <p>${res.summary}</p>
       <h3>Hypotheses</h3>${res.hypotheses.map(h => html`<div class="item"><b>${h.title}</b> ${pill(h.status, h.status === 'SUPPORTED' ? 'ok' : 'muted')}<p>${h.description}</p><p>${evs(h.evidence_ids.slice(0, 6))}</p></div>`)}
       <h3>Alternative explanations</h3><ul>${res.alternative_explanations.map(x => html`<li>${x}</li>`)}</ul>
       <h3>Missing information</h3><ul>${res.missing_information.map(x => html`<li>${x}</li>`)}</ul>
       ${a.validation_warnings.length ? alertBox('warn', 'Validation: ' + a.validation_warnings.join('; ')) : ''}
-      <h3>Investigation trace (${a.provider} / ${a.model} · ${a.steps_used}/${a.max_steps} steps)</h3>${trace}`;
+      <h3>Investigation trace (${a.provider} / ${a.model} / ${a.steps_used}/${a.max_steps} steps)</h3>${trace}`;
   } else {
     ai = html`${alertBox('bad', `AI investigation ${a.status}: ${a.error || 'no result produced'}. Rule-based findings are unaffected.`)}${trace}
       <button class="btn gap" data-act="agent" data-id="${v.id}" ${llm.configured ? '' : 'disabled'}>Retry AI investigation</button>`;
   }
-  const recs = v.recommendations.map(r => { const d = r.latest_decision; return html`<div class="item"><b class="${r.disruptive ? 'amber' : ''}">${r.disruptive ? 'DISRUPTIVE · ' : ''}${r.action}</b> ${pill(r.origin)}
+  const recs = v.recommendations.map(r => { const d = r.latest_decision; return html`<div class="item"><b class="${r.disruptive ? 'amber' : ''}">${r.disruptive ? 'DISRUPTIVE / ' : ''}${r.action}</b> ${pill(r.origin)}
     <p>${r.rationale}${r.risk ? ' Risk: ' + r.risk : ''}</p>
-    ${d ? alertBox('info', `${d.decision} by ${d.actor} at ${d.decided_at}. Execution: ${d.execution_status} — ${d.execution_detail}`) : ''}
+    ${d ? alertBox('info', `${d.decision} by ${d.actor} at ${d.decided_at}. Execution: ${d.execution_status} - ${d.execution_detail}`) : ''}
     ${r.requires_approval ? html`<button class="btn sm" data-act="decide" data-id="${v.id}" data-rec="${r.recommendation_id}" data-d="APPROVED">Approve (record only)</button> <button class="btn danger sm" data-act="decide" data-id="${v.id}" data-rec="${r.recommendation_id}" data-d="REJECTED">Reject</button>` : html`<span class="sp">No approval needed (non-disruptive).</span>`}</div>`; });
-  const src = v.source.uploads.map(u => html`<li>${u.filename} · ${u.detected_format} · accepted ${u.summary.accepted}, rejected ${u.summary.rejected}, unsupported ${u.summary.unsupported}</li>`);
+  const src = v.source.uploads.map(u => html`<li>${u.filename} / ${u.detected_format} / accepted ${u.summary.accepted}, rejected ${u.summary.rejected}, unsupported ${u.summary.unsupported}</li>`);
   return html`${head('INCIDENT', v.id, 'Evidence-linked investigation. Click any event ID to see the source record.')}${hdr}
     <div class="grid invest gap"><div class="stack">
       <div class="card box"><h3>FINDINGS (RULE-BASED)</h3>${findings}<h3>CORRELATION REASONING</h3>${links}</div>
       <div class="card box"><h3>AI INVESTIGATION</h3>${ai}</div>
       <div class="card box"><h3>ATTACK TIMELINE</h3>${timeline}</div>
-      <div class="card box"><h3>RECOMMENDED ACTIONS · NOT EXECUTED</h3>${recs}</div></div>
+      <div class="card box"><h3>RECOMMENDED ACTIONS / NOT EXECUTED</h3>${recs}</div></div>
     <div class="stack"><div class="card box"><h3>MITRE ATT&amp;CK</h3>${mitreAll}</div><div class="card box scroll"><h3>INDICATORS</h3>${iocs}</div>
       <div class="card box"><h3>SOURCE</h3><ul class="sp">${src}</ul><p class="sp">Dataset events: ${v.scope.dataset_events}; evidence events: ${v.scope.evidence_events}.</p></div></div></div>`;
 }
@@ -171,7 +177,7 @@ async function incident() {
 async function mitreView() {
   const m = await api('/api/mitre');
   if (!m.groups.length) return html`${head('ATT&CK', 'MITRE ATT&CK', 'Technique mappings supported by evidence.')}<div class="empty"><h2>No mappings</h2><p>Mappings appear only when analysed evidence supports them.</p></div>`;
-  return html`${head('ATT&CK', 'MITRE ATT&CK', 'OBSERVED = behaviour present in logs · SUSPECTED = inferred from a pattern. Neither proves malicious intent.')}
+  return html`${head('ATT&CK', 'MITRE ATT&CK', 'OBSERVED = behaviour present in logs. SUSPECTED = inferred from a pattern. Neither proves malicious intent.')}
     <div class="grid matrix">${m.groups.map(g => html`<div class="card"><div class="title">${g.tactic.toUpperCase()}</div>${g.techniques.map(t => html`<div class="tech"><b>${t.technique_id} ${t.name}</b><br>${pill(t.status, t.status === 'OBSERVED' ? 'ok' : 'warn')} ${pill(t.origin === 'RULE' ? 'RULE' : 'AI HYPOTHESIS')}<p>${t.basis || (t.bases || [])[0]}</p><p>${t.investigations.join(', ')}</p></div>`)}</div>`)}</div>`;
 }
 
@@ -182,7 +188,7 @@ function connectors() {
     <div class="card box"><div class="row"><h2>${c.name}</h2>${pill(c.status, kind)}${c.live ? pill('LIVE', 'ok') : pill('NOT LIVE', 'muted')}</div>
     ${alertBox(kind, c.message)}
     <dl class="kv gap"><dt>LAST SUCCESS</dt><dd>${c.last_success || 'never'}</dd><dt>NEWEST EVENT</dt><dd>${c.last_event || 'none received'}</dd><dt>EVENTS STORED</dt><dd>${c.events_stored_total ?? 0}</dd>
-    <dt>LIVE WINDOW</dt><dd>${c.live_window_seconds}s</dd><dt>LAST ERROR</dt><dd>${c.last_error ? c.last_error.kind + ' — ' + c.last_error.detail : 'none'}</dd></dl>
+    <dt>LIVE WINDOW</dt><dd>${c.live_window_seconds}s</dd><dt>LAST ERROR</dt><dd>${c.last_error ? c.last_error.kind + ' - ' + c.last_error.detail : 'none'}</dd></dl>
     ${(c.warnings || []).map(w => alertBox('warn', w))}
     <div class="row gap"><button class="btn ghost" data-act="wtest">Test connection</button><button class="btn" data-act="wpoll">Poll now</button>${c.dataset_id ? html`<button class="btn ghost" data-act="events" data-id="${c.dataset_id}">View events</button>` : ''}</div>
     <p class="sp">Configure with environment variables on the server (never in the browser): SENTINEL_WAZUH_INDEXER_URL, SENTINEL_WAZUH_USER, SENTINEL_WAZUH_PASSWORD. File uploads are never treated as live telemetry.</p></div>`;
@@ -192,9 +198,9 @@ async function settings() {
   const st = S.status, au = await api('/api/audit?limit=30');
   return html`${head('CONFIGURATION', 'Status & settings', 'What is configured, and what is not.')}
     <div class="grid stats"><div class="card stat"><small>API AUTH</small><b class="${st.auth === 'ENABLED' ? 'green' : 'amber'}">${st.auth}</b><small>SENTINEL_API_TOKEN</small></div>
-    <div class="card stat"><small>LLM</small><b class="${st.llm.configured ? 'green' : 'amber'}">${st.llm.status}</b><small>${st.llm.provider || '—'} ${st.llm.model || ''}</small></div>
+    <div class="card stat"><small>LLM</small><b class="${st.llm.configured ? 'green' : 'amber'}">${st.llm.status}</b><small>${st.llm.provider || 'none'} ${st.llm.model || ''}</small></div>
     <div class="card stat"><small>THREAT INTEL</small><b class="amber">${st.threat_intel.status}</b><small>${st.threat_intel.provider || 'none'}</small></div>
-    <div class="card stat"><small>AGENT LIMITS</small><b>${st.agent.max_steps}</b><small>MAX STEPS · ${st.agent.deadline_seconds}s</small></div></div>
+    <div class="card stat"><small>AGENT LIMITS</small><b>${st.agent.max_steps}</b><small>MAX STEPS / ${st.agent.deadline_seconds}s</small></div></div>
     <div class="card gap box"><p class="sp">${st.llm.message}</p><p class="sp">${st.threat_intel.message}</p>
     <span class="field"><label for="tok">API token (kept in this browser tab only)</label><input id="tok" type="password" autocomplete="off" value="${token()}"></span><button class="btn sm" data-act="savetoken">Save token</button></div>
     <div class="card gap"><div class="title">AUDIT LOG (latest)</div><div class="box scroll"><table class="table"><tr><th>TIME</th><th>ACTOR</th><th>ACTION</th><th>TARGET</th></tr>${au.entries.map(e => html`<tr><td>${e.ts}</td><td>${e.actor}</td><td>${e.action}</td><td>${e.target}</td></tr>`)}</table></div></div>`;
@@ -231,16 +237,16 @@ async function showEvent(id, ds) {
   try {
     const dsid = ds || (S.view === 'incident' ? (await api('/api/investigations/' + encodeURIComponent(S.arg))).dataset_id : S.arg || (S.datasets[0] || {}).id);
     const e = await api(`/api/datasets/${encodeURIComponent(dsid)}/events/${encodeURIComponent(id)}`);
-    d.innerHTML = html`<button class="btn ghost sm" data-act="closedrawer">Close ✕</button><h2>${e.event_id}</h2>
+    d.innerHTML = html`<button class="btn ghost sm" data-act="closedrawer">Close</button><h2>${e.event_id}</h2>
       <dl class="kv">${['timestamp', 'host', 'source_type', 'username', 'target_user', 'src_ip', 'src_port', 'dst_ip', 'dst_port', 'process', 'command', 'file_path', 'category', 'action', 'outcome', 'source_file', 'line_no', 'parser']
         .filter(k => e[k] !== null && e[k] !== undefined).map(k => html`<dt>${k}</dt><dd class="mono">${e[k]}</dd>`)}</dl>
       ${e.notes && e.notes.length ? alertBox('warn', 'Notes: ' + e.notes.join(', ')) : ''}<h3>Original record (untrusted)</h3><pre>${e.raw}</pre>`.s;
-  } catch (err) { d.innerHTML = html`<button class="btn ghost sm" data-act="closedrawer">Close ✕</button>${alertBox('bad', 'Could not load event: ' + err.message)}`.s; }
+  } catch (err) { d.innerHTML = html`<button class="btn ghost sm" data-act="closedrawer">Close</button>${alertBox('bad', 'Could not load event: ' + err.message)}`.s; }
   d.classList.remove('hide'); d.querySelector('button').focus();
 }
 async function act(btn) {
   const a = btn.dataset.act, id = btn.dataset.id;
-  const run = async (label, fn) => { btn.disabled = true; announce(label + '…'); try { await fn(); } catch (e) { announce('Error: ' + e.message); q('#content').insertAdjacentHTML('afterbegin', alertBox('bad', label + ' failed: ' + e.message).s); } finally { btn.disabled = false; } };
+  const run = async (label, fn) => { btn.disabled = true; announce(label + '...'); try { await fn(); } catch (e) { announce('Error: ' + e.message); q('#content').insertAdjacentHTML('afterbegin', alertBox('bad', label + ' failed: ' + e.message).s); } finally { btn.disabled = false; } };
   switch (a) {
     case 'nav': return go(btn.dataset.v);
     case 'open': return go('incident', id);
@@ -249,7 +255,7 @@ async function act(btn) {
     case 'closedrawer': return q('#drawer').classList.add('hide');
     case 'upload': {
       const f = q('#file').files[0]; if (!f) return announce('Choose a file first');
-      S.busy = true; btn.disabled = true; btn.textContent = 'Uploading…';
+      S.busy = true; btn.disabled = true; btn.textContent = 'Uploading...';
       const fd = new FormData(); fd.append('file', f);
       if (q('#dsname').value) fd.append('dataset_name', q('#dsname').value);
       if (q('#dsid').value) fd.append('dataset_id', q('#dsid').value);
