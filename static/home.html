@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <meta name="description" content="Sentinel AI turns security logs into structured, evidence-grounded investigations.">
+  <title>Sentinel AI — Follow the evidence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;600;700;800&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/home.css">
+  <script src="/assets/home.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="Sentinel AI home">
+      <span class="brand-mark" aria-hidden="true">S</span>
+      <span>SENTINEL <span class="brand-ai">AI</span></span>
+    </a>
+    <nav class="main-nav" aria-label="Main navigation">
+      <a href="#product">Product</a>
+      <a href="#how-it-works">How it works</a>
+      <a href="#security-principles">Security principles</a>
+    </nav>
+    <div class="header-actions">
+      <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch to light mode" title="Switch to light mode">
+        <svg class="sun-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg>
+        <svg class="moon-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.9 13.1A8.9 8.9 0 0 1 10.9 3.1 9 9 0 1 0 20.9 13.1Z"/></svg>
+      </button>
+      <a class="nav-cta" href="/app/#/overview">Enter Command Center</a>
+      <button class="menu-toggle" id="menu-toggle" aria-label="Open navigation" aria-expanded="false" aria-controls="main-nav-mobile" type="button"><span></span><span></span></button>
+    </div>
+  </header>
+  <nav class="mobile-nav" id="main-nav-mobile" aria-label="Mobile navigation" hidden>
+    <a href="#product">Product</a>
+    <a href="#how-it-works">How it works</a>
+    <a href="#security-principles">Security principles</a>
+    <a href="/app/#/overview">Enter Command Center</a>
+  </nav>
+
+  <main id="main">
+    <section class="hero" aria-labelledby="hero-title">
+      <video class="hero-video" autoplay muted loop playsinline preload="metadata" poster="/assets/sentinel-particles-poster.jpg" aria-hidden="true" tabindex="-1">
+        <source src="/assets/sentinel-particles.mp4" type="video/mp4">
+      </video>
+      <div class="hero-shade" aria-hidden="true"></div>
+      <div class="hero-grain" aria-hidden="true"></div>
+      <div class="hero-content">
+        <p class="eyebrow"><span class="eyebrow-line" aria-hidden="true"></span> Evidence-driven security intelligence <span class="eyebrow-line" aria-hidden="true"></span></p>
+        <h1 id="hero-title"><span>Every signal</span><span class="headline-secondary">tells a story.</span><span class="headline-last">Follow the evidence.</span></h1>
+        <p class="hero-copy">Turn security logs into structured investigations, traceable findings and understandable attack timelines.</p>
+        <div class="hero-actions">
+          <a class="button button-primary" href="/app/#/overview">Enter Command Center</a>
+          <a class="button button-secondary" href="#how-it-works">Explore how it works</a>
+        </div>
+        <p class="hero-note"><span class="note-rule" aria-hidden="true"></span> Evidence first. Automation with accountability.</p>
+      </div>
+      <a class="scroll-cue" href="#how-it-works" aria-label="Scroll to how it works"><span>SCROLL TO EXPLORE</span><span class="scroll-line" aria-hidden="true"></span></a>
+    </section>
+
+    <section class="principle-strip" aria-label="Product principles">
+      <div><span class="micro-label">01 / FINDINGS</span><p>Evidence-linked</p></div>
+      <div><span class="micro-label">02 / DETECTION</span><p>Rule-based</p></div>
+      <div><span class="micro-label">03 / DECISIONS</span><p>Human-controlled</p></div>
+    </section>
+
+    <section class="section workflow-section" id="how-it-works" aria-labelledby="workflow-title">
+      <div class="section-heading reveal">
+        <div><p class="section-index">01 — OPERATIONAL PIPELINE</p><h2 id="workflow-title">From raw signals<br><span>to clear findings.</span></h2></div>
+        <p class="section-intro">A transparent investigation workflow that keeps evidence visible at every stage.</p>
+      </div>
+      <div class="workflow-grid">
+        <article class="workflow-step reveal"><span class="step-number">01</span><span class="step-arrow" aria-hidden="true">↘</span><p class="micro-label">INGEST</p><h3>Unified collection</h3><p>Upload and parse security logs from supported sources into a normalised event store.</p></article>
+        <article class="workflow-step reveal"><span class="step-number">02</span><span class="step-arrow" aria-hidden="true">↘</span><p class="micro-label">CORRELATE</p><h3>Transparent rules</h3><p>Connect related events using explicit detection rules and recorded correlation reasons.</p></article>
+        <article class="workflow-step reveal"><span class="step-number">03</span><span class="step-arrow" aria-hidden="true">↘</span><p class="micro-label">INVESTIGATE</p><h3>Evidence review</h3><p>Examine findings, timelines, indicators of compromise and evidence-supported MITRE ATT&amp;CK mappings.</p></article>
+        <article class="workflow-step reveal"><span class="step-number">04</span><span class="step-arrow" aria-hidden="true">↘</span><p class="micro-label">REPORT</p><h3>Traceable reporting</h3><p>Generate a structured report that helps analysts review findings and communicate what the evidence supports.</p></article>
+      </div>
+    </section>
+
+    <section class="section capabilities-section" id="product" aria-labelledby="capabilities-title">
+      <div class="section-heading reveal"><div><p class="section-index">02 — PLATFORM CAPABILITIES</p><h2 id="capabilities-title">Clarity, built<br><span>into the process.</span></h2></div><p class="section-intro">A focused set of capabilities designed to make investigations understandable—not to hide complexity behind a black box.</p></div>
+      <div class="capabilities-list">
+        <article class="capability reveal"><span class="capability-no">A / 01</span><div><h3>Evidence-linked findings</h3><p>Inspect source events and the reasons behind rule-based findings instead of relying on unexplained alerts.</p></div><span class="capability-mark" aria-hidden="true">↗</span></article>
+        <article class="capability reveal"><span class="capability-no">A / 02</span><div><h3>Attack timelines &amp; correlation</h3><p>Review the sequence of observed events and see why records were grouped into a case.</p></div><span class="capability-mark" aria-hidden="true">↗</span></article>
+        <article class="capability reveal"><span class="capability-no">A / 03</span><div><h3>Indicators &amp; MITRE ATT&amp;CK</h3><p>Inspect extracted indicators and technique mappings with their stated evidence basis and uncertainty.</p></div><span class="capability-mark" aria-hidden="true">↗</span></article>
+        <article class="capability reveal"><span class="capability-no">A / 04</span><div><h3>Optional AI investigation</h3><p>When configured, a bounded AI agent can investigate a case using scoped, read-only tools. Rule-based findings remain available if AI is off.</p></div><span class="capability-mark" aria-hidden="true">↗</span></article>
+      </div>
+    </section>
+
+    <section class="trust-section" id="security-principles" aria-labelledby="trust-title">
+      <div class="trust-copy reveal"><p class="section-index">03 — SECURITY PRINCIPLES</p><h2 id="trust-title">AI investigates.<br><span>Humans stay in control.</span></h2><p>Findings should be reviewed against the events they cite. AI-assisted analysis can support an investigation, but it does not replace analyst judgement.</p><a class="text-link" href="/app/#/overview">Enter the command center <span aria-hidden="true">↗</span></a></div>
+      <div class="trust-list">
+        <article class="trust-item reveal"><span>01</span><div><h3>Evidence before conclusions</h3><p>Keep original records accessible and evaluate findings against their stated evidence.</p></div></article>
+        <article class="trust-item reveal"><span>02</span><div><h3>AI is optional</h3><p>AI investigation requires a configured provider; its hypotheses are distinct from rule-based findings.</p></div></article>
+        <article class="trust-item reveal"><span>03</span><div><h3>Human-controlled decisions</h3><p>Approvals and rejections are recorded decisions. The application does not automatically execute response actions.</p></div></article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer"><a class="brand footer-brand" href="/"><span class="brand-mark" aria-hidden="true">S</span><span>SENTINEL <span class="brand-ai">AI</span></span></a><p>Security investigations. Evidence in view.</p><a href="/app/#/overview">Open command center ↗</a><span class="footer-note">BUILT AROUND EVIDENCE · HUMAN CONTROL</span></footer>
+</body>
+</html>
